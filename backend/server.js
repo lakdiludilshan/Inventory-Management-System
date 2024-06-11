@@ -4,6 +4,7 @@
  const bodyParser = require('body-parser');
  const cors = require('cors');
  const UserRoute = require('./routes/UserRoute');
+ const errorhandeler = require('./middleware/ErrorMiddleware');
 
  const app = express();
 
@@ -19,6 +20,9 @@
  app.get("/", (req, res) => {
      res.send("Hello Page")
  })
+
+ //Error Handler
+    app.use(errorhandeler);
  
  //Connect to DB and Start server
  const PORT = process.env.PORT || 5000;
