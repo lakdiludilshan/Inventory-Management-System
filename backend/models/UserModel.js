@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bycrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -25,6 +26,7 @@ const UserSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: [true, "Please provide a phone number"],
+        default: "+94",
         min: [10, "Phone number must be at least 10 characters long"],
         max: 13
     },
@@ -40,6 +42,18 @@ const UserSchema = new mongoose.Schema({
         default: "empty-profile.png"
     },
 }, { timestamps: true, });
+
+    // hash the password
+    UserSchema.pre("save", async function (next) {
+     if(this.isModified("password")) {
+        return next();
+     }
+
+        //hashedpassword
+        const salt = await bycrype.genSalt(10)
+        const hashedPassword = await bycrype.hash(this.password, salt);
+        this.password = hashedPassword;
+    })
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
