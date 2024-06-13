@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        required: [true, "Please provide a username"],
+      //  required: [true, "Please provide a username"],
         min: 6,
         max: 255
     },
@@ -53,6 +53,7 @@ const UserSchema = new mongoose.Schema({
         const salt = await bycrype.genSalt(10)
         const hashedPassword = await bycrype.hash(this.password, salt);
         this.password = hashedPassword;
+        next();
     })
 
 const User = mongoose.model('User', UserSchema);
