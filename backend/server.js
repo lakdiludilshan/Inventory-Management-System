@@ -5,13 +5,16 @@
  const cors = require('cors');
  const UserRoute = require('./routes/UserRoute');
  const errorhandeler = require('./middleware/ErrorMiddleware');
+ const cookieParser = require('cookie-parser');
 
  const app = express();
 
  //Middlewares
     app.use(express.json());
+    app.use(cookieParser());
     app.use(express.urlencoded({ extended: false }));
     app.use(bodyParser.json());
+    app.use(cors());
 
  //Routes Middleware
     app.use('/api/users', UserRoute);
