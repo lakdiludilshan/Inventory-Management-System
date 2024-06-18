@@ -124,8 +124,14 @@ const logout = asyncHandler( async (req, res) => {
     });
 });
 
+//Get user data
+const getuser = asyncHandler( async (req, res) => {
+    res.send("got user data");
+});
+
 module.exports = {
     registerUser,
     loginUser,
     logout,
+    getuser,
 }
