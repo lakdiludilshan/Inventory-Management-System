@@ -129,7 +129,7 @@ const getuser = asyncHandler( async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-        const { _id, name, email, photo, phone } = user
+        const { _id, name, email, photo, phone } = user;
         res.status(200).json({
             _id, name, email, photo, phone,
         });
@@ -138,11 +138,32 @@ const getuser = asyncHandler( async (req, res) => {
         res.status(400);
         throw new Error("User Not Found")
     }
+    
 });
+
+//Get Login Status
+const loginStatus = asyncHandler( async (req, res) => {
+
+    const token = req.cookies.token;
+    if(!token) {
+        return res.json(false)
+    }
+
+    // verify token
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if(verified) {
+        return res.json(true)
+    }
+    else {
+        return res.json(false)
+    }
+
+}) ;
 
 module.exports = {
     registerUser,
     loginUser,
     logout,
     getuser,
-}
+    loginStatus,
+};
