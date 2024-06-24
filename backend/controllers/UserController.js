@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 const bycrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {
@@ -218,7 +219,44 @@ const changePassword = asyncHandler( async (req, res) => {
 });
 
 const forgotPassword = asyncHandler( async (req, res) => {
-    res.send("Forgot Password Route")
+    const { email } = req.body;
+    const user = await User.findOne({email})
+
+    if(!user) {
+        res.status(404);
+        throw new Error("User does not exist")
+    }
+
+    //Generate reset token
+    let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+
+    //Hash the reset token
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    
+    //save token to db
+    await new Token({
+        userId: user._id,
+        token: hashedToken,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 30 * (60 * 1000), //30 minutes
+    }).save();
+
+    //construct reset url
+    const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+
+    //reset email message
+    const message = `
+        <h2>Hello ${user.name}</h2>
+        <p>Please click the link below to reset your password</p>
+        <p>This link will expire in 30 minutes</p>
+
+        <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+
+        <p>Regards...</p>
+        <p>Lakdilus Inventory Soft.</p>
+    `;
+    res.send("forgot the fu***ng password")
+
 });
 
 module.exports = {
