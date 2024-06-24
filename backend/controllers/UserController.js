@@ -161,7 +161,33 @@ const loginStatus = asyncHandler( async (req, res) => {
 
 //update user
 const updateUser = asyncHandler( async (req, res) => {
-    res.send("User Updated")
+
+    const user = await User.findById(req.user._id);
+    if (user) {
+        const { name, email, photo, phone } = user;
+    
+        user.name = req.body.name || name;
+        user.email = email;
+        user.phone = req.body.phone || phone;
+        user.photo = req.body.photo || photo;
+
+        const updatedUser = await user.save();
+        res.status(200).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            phone: updatedUser.phone,
+            photo: updatedUser.photo,
+        })
+    }
+    else {
+        res.status(400);
+        throw new Error("User Not Found")
+    }
+});
+
+const changePassword = asyncHandler( async (req, res) => {
+    res.send("Change Password");
 });
 
 module.exports = {
@@ -171,4 +197,5 @@ module.exports = {
     getuser,
     loginStatus,
     updateUser,
+    changePassword,
 };
