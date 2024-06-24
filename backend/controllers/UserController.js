@@ -3,6 +3,8 @@ const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 const bycrypt = require('bcryptjs');
 const crypto = require('crypto');
+const Token = require('../models/TokenModel');
+const sendEmail = require('../utils/SendEmail');
 
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {
@@ -227,19 +229,30 @@ const forgotPassword = asyncHandler( async (req, res) => {
         throw new Error("User does not exist")
     }
 
+    //delete any existing reset token
+    let token = await Token.findOne({userId: user._id});
+    if (token) {
+        await token.deleteOne();
+    }
+
     //Generate reset token
     let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
 
     //Hash the reset token
     const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     
-    //save token to db
+    try {
+        //save token to db
     await new Token({
         userId: user._id,
         token: hashedToken,
         createdAt: Date.now(),
         expiresAt: Date.now() + 30 * (60 * 1000), //30 minutes
     }).save();
+    } catch (error) {
+        console.log(error)
+    }
+    
 
     //construct reset url
     const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
@@ -255,8 +268,22 @@ const forgotPassword = asyncHandler( async (req, res) => {
         <p>Regards...</p>
         <p>Lakdilus Inventory Soft.</p>
     `;
-    res.send("forgot the fu***ng password")
+    const subject = "Password Reset Request";
+    const send_to = user.email;
+    const sent_from = process.env.EMAIL_USER;
 
+    try {
+        await sendEmail(subject, message, send_to, sent_from);
+        res.status(200).json({success: true, message: "Password reset link sent to your email successfully"});
+    } catch (error) {
+        res.status(500);
+        throw new Error("Email could not be sent. please try again");
+    }
+    
+});
+
+const resetPassword = asyncHandler( async (req, res) => {
+    res.send("Reset Password Route");
 });
 
 module.exports = {
@@ -268,4 +295,5 @@ module.exports = {
     updateUser,
     changePassword,
     forgotPassword,
+    resetPassword,
 };

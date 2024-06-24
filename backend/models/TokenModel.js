@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const tokenSchema = mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        required: true,
+        ref: 'User'
     },
     token: {
         type: String,
@@ -12,7 +12,8 @@ const tokenSchema = mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
     expiresAt: {
         type: Date,
