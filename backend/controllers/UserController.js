@@ -187,7 +187,38 @@ const updateUser = asyncHandler( async (req, res) => {
 });
 
 const changePassword = asyncHandler( async (req, res) => {
-    res.send("Change Password");
+    const user = await User.findById(req.user._id);
+    const { oldPassword, password } = req.body;
+
+    if(!user) {
+        res.status(400);
+        throw new Error("User Not Found, please Signup again")
+    }
+    
+    if(!oldPassword || !password) {
+        res.status(400);
+        throw new Error("Please fill all requierd fields")
+    }
+
+    //check if the old password is match with the password in db
+    const isPasswordMatch = await bycrypt.compare(oldPassword, user.password);
+
+    //save new password 
+    if(user && isPasswordMatch) {
+        user.password = password;
+        await user.save();
+        res.status(200).json({
+            message: "Password Updated Successfully"
+        })
+    }
+    else {
+        res.status(400);
+        throw new Error("Invalid Password")
+    }
+});
+
+const forgotPassword = asyncHandler( async (req, res) => {
+    res.send("Forgot Password Route")
 });
 
 module.exports = {
@@ -198,4 +229,5 @@ module.exports = {
     loginStatus,
     updateUser,
     changePassword,
+    forgotPassword,
 };
