@@ -283,7 +283,33 @@ const forgotPassword = asyncHandler( async (req, res) => {
 });
 
 const resetPassword = asyncHandler( async (req, res) => {
-    res.send("Reset Password Route");
+    
+    const { password } = req.body; 
+    const { resetToken } = req.params;
+
+    //Hash the reset token and then compare it with the hashed token in the db
+    const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+    //Find the token in the db
+    const userToken = await Token.findOne({ token: hashedToken, expiresAt: { $gt: Date.now() } });
+
+    if (!userToken) {
+        res.status(404);
+        throw new Error("Invalid or expired reset token");
+    }
+
+    //Find the user in the db
+    const user = await User.findById({_id: userToken.userId});
+    user.password = password;
+    await user.save();
+    res.status(200).json({
+        success: true, 
+        message: "Password reset successfully"
+    });
+
 });
 
 module.exports = {
