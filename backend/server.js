@@ -6,6 +6,7 @@
  const UserRoute = require('./routes/UserRoute');
  const errorhandeler = require('./middleware/ErrorMiddleware');
  const cookieParser = require('cookie-parser');
+ require('events').EventEmitter.defaultMaxListeners = 20;
 
  const app = express();
 
