@@ -1,3 +1,6 @@
+const asyncHandler = require("express-async-handler");
+const Category = require("../models/CategoryModel");
+
 const createCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
   const category = new Category({
@@ -45,3 +48,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
     throw new Error("Category not found");
   }
 });
+
+module.exports = {
+  createCategory,
+  getCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory
+};

@@ -4,6 +4,7 @@
  const bodyParser = require('body-parser');
  const cors = require('cors');
  const UserRoute = require('./routes/UserRoute');
+ const CategoryRoute = require('./routes/CategoryRoute');
  const errorhandeler = require('./middleware/ErrorMiddleware');
  const cookieParser = require('cookie-parser');
  require('events').EventEmitter.defaultMaxListeners = 20;
@@ -19,6 +20,7 @@
 
  //Routes Middleware
     app.use('/api/users', UserRoute);
+    app.use('/api/categories', CategoryRoute);
 
  //Routes
  app.get("/", (req, res) => {
