@@ -1,11 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
 import loginImage from "../assets/login.svg";
 import logins from "../assets/loginbg.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const login = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState({});
 
-  
+  const changeValue = (e) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleChange = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/users/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.status === 200) {
+        const userData = await response.json();
+        console.log(userData);
+        localStorage.setItem("jwt", userData.jwt);
+        if (userData) {
+          toast.success("User Login Successfull", {
+            duration: 3000,
+            position: "top-right",
+          });
+          navigate("/");
+        }
+      } else {
+        toast.error("Login failed, please check your credentials.",{
+          duration: 3000,
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred. Please try again later.",{
+        duration: 3000,
+        position: "top-right",
+      });
+    }
+  };
 
   return (
     <div
@@ -35,7 +84,7 @@ const login = () => {
               href="#"
               className="font-semibold leading-6 text-black hover:text-indigo-900"
             >
-              SignUp
+              Register
             </Link>
           </p>
         </div>
@@ -45,7 +94,7 @@ const login = () => {
             Sign In
           </h1>
           <div className="flex flex-col px-10 justify-center ">
-            <form className="space-y-6" method="POST" onSubmit={0}>
+            <form className="space-y-6" method="POST" onSubmit={handleChange}>
               <div>
                 <label
                   htmlFor="email"
@@ -60,7 +109,7 @@ const login = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    onChange={0}
+                    onChange={changeValue}
                     className="block w-full pl-1.5 rounded-md border-5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -82,7 +131,7 @@ const login = () => {
                     type="password"
                     autoComplete="current-password"
                     required
-                    onChange={0}
+                    onChange={changeValue}
                     className="block w-full pl-1.5 rounded-md border-5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -100,6 +149,7 @@ const login = () => {
           </div>
         </div>
       </div>
+      <Toaster />
       <div className="col-span-2"></div>
     </div>
   );

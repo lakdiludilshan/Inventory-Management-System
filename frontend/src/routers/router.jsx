@@ -10,6 +10,8 @@ import Sales from "../pages/sales";
 import UserLayout from "../externals/userlayout";
 import Login from "../externals/login";
 import Register from "../externals/register";
+import User from "../pages/user";
+import Report from "../pages/report";
 import App from "../App";
 
 const router = createBrowserRouter([
@@ -45,16 +47,20 @@ const router = createBrowserRouter([
         path: "/sales",
         element: <Sales />,
       },
+      {
+        path: "/user",
+        element: <User />,
+      },
+      {
+        path: "/report",
+        element: <Report />,
+      }
     ],
   },
   {
     path: "/user",
     element: <UserLayout />,
     children: [
-      // {
-      //   path: "/user",
-      //   path: <User />,
-      // },
       {
         path: "/user/login",
         element: <Login />,
