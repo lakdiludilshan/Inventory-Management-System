@@ -3,6 +3,9 @@ import loginImage from "../assets/login.svg";
 import logins from "../assets/loginbg.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import Cookies  from 'universal-cookie';
+
+const cookies = new Cookies();
 
 const login = () => {
   const navigate = useNavigate();
@@ -30,10 +33,16 @@ const login = () => {
         }
       );
 
-      if (response.status === 200) {
+
+      if (response.status === 201) {
         const userData = await response.json();
         console.log(userData);
-        localStorage.setItem("jwt", userData.jwt);
+        cookies.set('token', userData.token, {
+          path: '/',
+          maxAge: 86400, // 1 day in seconds
+          sameSite: 'none', // Adjust sameSite based on your requirements
+          secure: true, // Ensure the cookie is sent only over HTTPS
+        });
         if (userData) {
           toast.success("User Login Successfull", {
             duration: 3000,

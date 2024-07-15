@@ -5,7 +5,13 @@ const jwt = require('jsonwebtoken');
 
 const protect = asyncHandler(async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        let token = req.cookies.token;
+        const tokenBearer = req.headers.authorization;
+        console.log(tokenBearer);
+        if(tokenBearer && tokenBearer.startsWith('Bearer')) {
+            token = tokenBearer.split(' ')[1].trim();
+        }
+        console.log(token);
         if(!token) {
             res.status(401);
             throw new Error('Not authorized, please login first');

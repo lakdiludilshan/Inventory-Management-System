@@ -5,6 +5,7 @@
  const cors = require('cors');
  const UserRoute = require('./routes/UserRoute');
  const CategoryRoute = require('./routes/CategoryRoute');
+ const CustomerRoute = require('./routes/CustomerRoute');
  const errorhandeler = require('./middleware/ErrorMiddleware');
  const cookieParser = require('cookie-parser');
  require('events').EventEmitter.defaultMaxListeners = 20;
@@ -13,14 +14,22 @@
 
  //Middlewares
     app.use(express.json());
-    app.use(cookieParser());
+    app.use(cookieParser({
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    }));
     app.use(express.urlencoded({ extended: false }));
     app.use(bodyParser.json());
-    app.use(cors());
+    app.use(cors({
+        origin: 'http://localhost:5173',
+        credentials: true
+    }));
 
  //Routes Middleware
     app.use('/api/users', UserRoute);
     app.use('/api/categories', CategoryRoute);
+    app.use('/api/customers', CustomerRoute);
 
  //Routes
  app.get("/", (req, res) => {
