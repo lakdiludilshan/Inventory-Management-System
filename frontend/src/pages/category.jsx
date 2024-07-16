@@ -18,7 +18,7 @@ const Category = () => {
 
   const fetchCategories = () => {
     axios
-      .get("/api/categories/getcategories", {
+      .get("http://localhost:5000/api/categories/getcategories", {
         headers: {
           Authorization: `Bearer ${cookies.get("token")}`,
         },
@@ -71,9 +71,15 @@ const Category = () => {
         value={categoryName}
         onChange={(e) => setCategoryName(e.target.value)}
       />
-      <button onClick={createCategory}>Create Category</button>
+       <button 
+          className="border border-blue-700 bg-blue-900"
+          onClick={createCategory}
+          >
+            {" "}
+            Create Customer{" "}
+          </button>
       <ToastContainer />
-
+      <div>
       <h2>Categories List</h2>
       {Array.isArray(categories) && categories.length > 0 ? (
         <ul>
@@ -84,7 +90,7 @@ const Category = () => {
       ) : (
         <p>No categories available.</p>
       )}
-
+    </div>
     </div>
   );
 };
