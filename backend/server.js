@@ -6,6 +6,7 @@
  const UserRoute = require('./routes/UserRoute');
  const CategoryRoute = require('./routes/CategoryRoute');
  const CustomerRoute = require('./routes/CustomerRoute');
+ const SupplierRoute = require('./routes/SupplierRoute');
  const errorhandeler = require('./middleware/ErrorMiddleware');
  const cookieParser = require('cookie-parser');
  require('events').EventEmitter.defaultMaxListeners = 20;
@@ -30,6 +31,7 @@
     app.use('/api/users', UserRoute);
     app.use('/api/categories', CategoryRoute);
     app.use('/api/customers', CustomerRoute);
+    app.use('/api/suppliers', SupplierRoute);
 
  //Routes
  app.get("/", (req, res) => {

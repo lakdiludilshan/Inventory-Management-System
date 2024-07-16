@@ -33,8 +33,8 @@ const updateSupplier = async (req, res) => {
 
 const deleteSupplier = async (req, res) => {
     const sid = req.params.id;
-    await Supplier.deleteOne({id: sid});
-    res.josn({ success: "Supplier Deleted"});
+    await Supplier.findByIdAndDelete(sid);
+    res.json({ success: "Supplier Deleted"});
 };
 
 module.exports = {

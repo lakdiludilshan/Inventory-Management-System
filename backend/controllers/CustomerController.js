@@ -34,7 +34,7 @@ const updateCustomer = async (req, res) => {
 
 const deleteCustomer = async (req, res) => {
   const cid = req.params.id;
-  await Customer.deleteOne({ id: cid });
+  await Customer.findByIdAndDelete(cid);
   res.json({ success: "Record deleted" });
 };
 
