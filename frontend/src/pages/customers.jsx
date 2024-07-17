@@ -57,6 +57,19 @@ const customers = () => {
     });
   };
 
+  const customerDelete = async (_id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/customers/deletecustomer/${_id}`
+      );
+      toast.success("Customer deleted successfully!");
+      fetchCustomers();
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      toast.error("Failed to delete customer");
+    }
+  };
+
   return (
     <div className="flex flex-col w-1/2">
       <form action="">
@@ -97,6 +110,12 @@ const customers = () => {
               <li key={customer._id}>
                 <span>{customer.name}</span>
                 <span>- {customer.description}</span>
+                <button 
+                onClick={() => customerDelete(customer._id)}
+                className="mx-2 border border-blue-700 bg-blue-900"
+                >
+                  Delete
+                </button>
               </li>
             ))}
           </ul>
