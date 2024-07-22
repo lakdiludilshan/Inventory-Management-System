@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import loginImage from "../assets/login.svg";
-import logins from "../assets/loginbg.jpg";
+import loginImage from "../../../assets/login.svg";
+import logins from "../../../assets/loginbg.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Cookies  from 'universal-cookie';
+import { useDispatch } from "react-redux";
+import { setUser } from "../slice/authSlice";
 
 const cookies = new Cookies();
 
 const login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [data, setData] = useState({});
 
@@ -30,24 +33,22 @@ const login = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
+
         }
+
       );
+      console.log(response);
 
 
       if (response.status === 201) {
         const userData = await response.json();
         console.log(userData);
-        cookies.set('token', userData.token, {
-          path: '/',
-          maxAge: 86400, // 1 day in seconds
-          sameSite: 'none', // Adjust sameSite based on your requirements
-          secure: true, // Ensure the cookie is sent only over HTTPS
-        });
         if (userData) {
           toast.success("User Login Successfull", {
             duration: 3000,
             position: "top-right",
           });
+          dispatch(setUser(userData));
           navigate("/");
         }
       } else {

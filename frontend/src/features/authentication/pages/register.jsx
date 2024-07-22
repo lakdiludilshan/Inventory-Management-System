@@ -2,8 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-import loginImage from "../assets/login.svg";
-import logins from "../assets/loginbg.jpg";
+import loginImage from "../../../assets/login.svg";
+import logins from "../../../assets/loginbg.jpg";
 
 const register = () => {
   const navigate = useNavigate();
