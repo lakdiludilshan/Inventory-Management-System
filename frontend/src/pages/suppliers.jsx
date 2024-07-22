@@ -61,7 +61,7 @@ const suppliers = () => {
     toast.success("Supplier deleted successfully!");
 
     // update state
-    const newSuppplierList = [...suppliers].filter((supplier) => {
+    const newSuppplierList = suppliers.filter((supplier) => {
       return supplier._id !== _id;
     });
 
@@ -106,6 +106,7 @@ const suppliers = () => {
       }
     );
     toast.success("Supplier updated successfully!");
+    
     // update state
     const newSupplier = [...suppliers];
     const supplierIndex = suppliers.findIndex((supplier) => {
