@@ -3,6 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "universal-cookie";
+import Modal from "./modal";
 
 const cookies = new Cookies();
 
@@ -192,6 +193,8 @@ const customers = () => {
           </form>
         </div>
       )}{" "}
+
+      <Modal>
       <div className="py-4">
         <h2>Customer List</h2>
         {Array.isArray(customers) && customers.length > 0 ? (
@@ -221,6 +224,7 @@ const customers = () => {
           <p>No customers available.</p>
         )}
       </div>
+      </Modal>
     </div>
   );
 };
