@@ -4,9 +4,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState([]);
   const [createForm, setCreateForm] = useState({
     name: "",
     description: "",
@@ -17,7 +17,6 @@ const Products = () => {
     quantity: 0,
     photo: "empty-product.png",
   });
-
   const [updateForm, setUpdateForm] = useState({
     _id: null,
     name: "",
@@ -31,24 +30,36 @@ const Products = () => {
   });
 
   useEffect(() => {
-    fetchProducts();
     fetchCategories();
     fetchSuppliers();
+    fetchProducts();
   }, []);
 
-  const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/api/products/getproducts");
-    setProducts(res.data.product);
-  };
-
   const fetchCategories = async () => {
-    const res = await axios.get("http://localhost:5000/api/categories/getcategories");
-    setCategories(res.data.categories);
+    try {
+      const res = await axios.get('http://localhost:5000/api/categories/getcategories');
+      setCategories(res.data);
+    } catch (error) {
+      toast.error("Error fetching categories.");
+    }
   };
 
   const fetchSuppliers = async () => {
-    const res = await axios.get("http://localhost:5000/api/suppliers/getsuppliers");
-    setSuppliers(res.data.supplier);
+    try {
+      const res = await axios.get('http://localhost:5000/api/suppliers/getsuppliers');
+      setSuppliers(res.data.supplier);
+    } catch (error) {
+      toast.error("Error fetching suppliers.");
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/products/getproducts');
+      setProducts(res.data.product);
+    } catch (error) {
+      toast.error("Error fetching products.");
+    }
   };
 
   const handleCreateForm = (e) => {
@@ -59,30 +70,6 @@ const Products = () => {
     });
   };
 
-  const createProduct = async (e) => {
-    e.preventDefault();
-    const res = await axios.post("http://localhost:5000/api/products/createproduct", createForm);
-    toast.success("Product created successfully!");
-    setProducts([...products, res.data.product]);
-    setCreateForm({
-      name: "",
-      description: "",
-      purchasePrice: 0,
-      sellingPrice: 0,
-      category: "",
-      supplier: "",
-      quantity: 0,
-      photo: "empty-product.png",
-    });
-  };
-
-  const deleteProduct = async (_id) => {
-    await axios.delete(`http://localhost:5000/api/products/deleteproduct/${_id}`);
-    toast.success("Product deleted successfully!");
-    const newProductList = products.filter((product) => product._id !== _id);
-    setProducts(newProductList);
-  };
-
   const handleUpdateForm = (e) => {
     const { name, value } = e.target;
     setUpdateForm({
@@ -91,40 +78,92 @@ const Products = () => {
     });
   };
 
+  const validateForm = (form) => {
+    const { category, supplier, photo } = form;
+    const objectIdPattern = /^[0-9a-fA-F]{24}$/;
+    if (!objectIdPattern.test(category) || !objectIdPattern.test(supplier)) {
+      toast.error("Please select valid Category and Supplier.");
+      return false;
+    }
+    if (!photo || photo.trim() === "") {
+      toast.error("Please provide a photo URL.");
+      return false;
+    }
+    return true;
+  };
+
+  const createProduct = async (e) => {
+    e.preventDefault();
+    if (!validateForm(createForm)) {
+      return;
+    }
+    try {
+      const res = await axios.post("http://localhost:5000/api/products/createproduct", createForm);
+      toast.success("Product created successfully!");
+      setProducts([...products, res.data]);
+      setCreateForm({
+        name: "",
+        description: "",
+        purchasePrice: 0,
+        sellingPrice: 0,
+        category: "",
+        supplier: "",
+        quantity: 0,
+        photo: "empty-product.png",
+      });
+    } catch (error) {
+      toast.error("Error creating product.");
+    }
+  };
+
+  const deleteProduct = async (_id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/products/deleteproduct/${_id}`);
+      toast.success("Product deleted successfully!");
+      setProducts(products.filter(product => product._id !== _id));
+    } catch (error) {
+      toast.error("Error deleting product.");
+    }
+  };
+
   const toggleUpdate = (product) => {
     setUpdateForm({
-      ...product,
       _id: product._id,
+      name: product.name,
+      description: product.description,
+      purchasePrice: product.purchasePrice,
+      sellingPrice: product.sellingPrice,
+      category: product.category,
+      supplier: product.supplier,
+      quantity: product.quantity,
+      photo: product.photo,
     });
   };
 
   const updateProduct = async (e) => {
     e.preventDefault();
-    const { _id, name, description, purchasePrice, sellingPrice, category, supplier, quantity, photo } = updateForm;
-    const res = await axios.put(`http://localhost:5000/api/products/updateproduct/${_id}`, {
-      name,
-      description,
-      purchasePrice,
-      sellingPrice,
-      category,
-      supplier,
-      quantity,
-      photo,
-    });
-    toast.success("Product updated successfully!");
-    const updatedProducts = products.map((product) => (product._id === _id ? res.data.product : product));
-    setProducts(updatedProducts);
-    setUpdateForm({
-      _id: null,
-      name: "",
-      description: "",
-      purchasePrice: 0,
-      sellingPrice: 0,
-      category: "",
-      supplier: "",
-      quantity: 0,
-      photo: "empty-product.png",
-    });
+    if (!validateForm(updateForm)) {
+      return;
+    }
+    try {
+      const res = await axios.put(`http://localhost:5000/api/products/updateproduct/${updateForm._id}`, updateForm);
+      toast.success("Product updated successfully!");
+      const updatedProducts = products.map(product => product._id === updateForm._id ? res.data : product);
+      setProducts(updatedProducts);
+      setUpdateForm({
+        _id: null,
+        name: "",
+        description: "",
+        purchasePrice: 0,
+        sellingPrice: 0,
+        category: "",
+        supplier: "",
+        quantity: 0,
+        photo: "empty-product.png",
+      });
+    } catch (error) {
+      toast.error("Error updating product.");
+    }
   };
 
   return (

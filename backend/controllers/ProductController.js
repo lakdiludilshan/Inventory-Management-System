@@ -1,8 +1,15 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/ProductModel");
+const mongoose = require('mongoose');
 
 const createProduct = async (req, res) => {
-    const {
+    try {
+      console.log('Request Body:', req.body);  // Log the request body
+      const { name, description, purchasePrice, sellingPrice, category, supplier, quantity, photo } = req.body;
+      if (!mongoose.Types.ObjectId.isValid(category) || !mongoose.Types.ObjectId.isValid(supplier)) {
+        return res.status(400).json({ error: "Invalid Category or Supplier ID" });
+      }
+      const product = new Product({
         name,
         description,
         purchasePrice,
@@ -11,19 +18,19 @@ const createProduct = async (req, res) => {
         supplier,
         quantity,
         photo,
-    } = req.body;
-    const product = await Product.create({
-        name,
-        description,
-        purchasePrice,
-        sellingPrice,
-        category,
-        supplier,
-        quantity,
-        photo,
-    })
-    res.json({product});
-};
+      });
+      await product.save();
+      res.status(201).json({ product });
+    } catch (error) {
+      console.error('Error creating product:', error);  // Log the error
+      if (error.name === "ValidationError") {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({ errors });
+      }
+      res.status(500).json({ error: "Server error" });
+    }
+  };
+  
 
 const getProducts = async (req, res) => {
     const product = await Product.find();
