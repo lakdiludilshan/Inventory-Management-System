@@ -24,12 +24,13 @@ const Category = () => {
         },
       })
       .then((response) => {
-        setCategories(response.data);
+        setCategories(response.data.categories);
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
         toast.error("Failed to load categories!");
       });
+      console.log(categories);
   };
 
   const createCategory = () => {
